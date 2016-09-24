@@ -39,12 +39,92 @@ public class Converter {
     
     @SuppressWarnings("unchecked")
     public static String csvToJson(String csvString) {
-        return "";
+        csvString = csvString.replaceAll("\n", ",");
+        CSVParser parser = new CSVParser();        
+        try {
+            String[] array = parser.parseLineMulti(csvString);
+        
+            JSONObject obj = new JSONObject();
+            JSONArray col = new JSONArray();
+            JSONArray row = new JSONArray();
+            JSONArray data = new JSONArray();
+            
+            for(int i = 1; i < array.length-1; i++) {
+                if(i < 5) { col.add(array[i]); }
+                else if(array[i].length() > 3) { row.add(array[i]); }
+                else if(array[i].length() <= 3){
+                    data.add(array[i++] + ","
+                           + array[i++] + ","
+                           + array[i++] + ","
+                           + array[i]);
+                }
+            }
+            obj.put("colHeaders", col);
+            obj.put("rowHeaders", row);
+            obj.put("data", data);
+            
+            return obj.toString();
+        }
+        catch(IOException e) {
+            return "";
+        }
     }
     
     public static String jsonToCsv(String jsonString) {
-        return "";
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject obj = (JSONObject) parser.parse(jsonString);
+            String csv = "";
+            
+            JSONArray col = (JSONArray) obj.remove("colHeaders");
+            JSONArray row = (JSONArray) obj.remove("rowHeaders");
+            JSONArray data = (JSONArray) obj.remove("data");
+            String colString = col.toString();
+            String[] rowArray = row.toString().split(",");
+            String[] dataArray = data.toString().split(",");
+            
+            csv += "\"ID\"," + colString + "\n";
+            for(int i = 0; i < rowArray.length; i++) {
+                csv += rowArray[i] + ",\"" + dataArray[(4*(i))] + ",\""
+                                         + dataArray[(4*(i))+1] + ",\"" 
+                                         + dataArray[(4*(i))+2] + ",\""
+                                         + dataArray[(4*(i))+3] + "\"\n";
+            }
+            
+            csv = csv.replace("[","");
+            csv = csv.replace("]","");
+            return csv;
+        }
+        catch(ParseException e) {
+            return "";
+        }
     }
+    
+    public boolean csvStringsAreEqual(String s, String t) {        
+        CSVParser parser = new CSVParser();
+        try {
+            String[] sArray = parser.parseLineMulti(s);
+            String[] tArray = parser.parseLineMulti(t);
+            return sArray.equals(tArray);
+        }
+        catch(IOException e) {
+            return false;
+        }
+    }
+    
+    public boolean jsonStringsAreEqual(String s, String t) {        
+        JSONParser parser = new JSONParser();
+        try {
+            Object sObj = parser.parse(s);
+            Object tObj = parser.parse(t);
+            return sObj.equals(tObj);
+        }
+        catch(ParseException e) {
+            return false;
+        }
+    }
+
+
 }
 
 

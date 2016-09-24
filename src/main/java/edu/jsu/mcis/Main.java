@@ -23,11 +23,18 @@ public class Main {
             }
         }
         catch(IOException e) { e.printStackTrace(); }
-        String testJson = jsonContents.toString();
+        String testJson = jsonContents.toString();        
 
+        System.out.println(testJson);
+        System.out.println("\n----------------\n");
+        
         String json = Converter.csvToJson(testCsv);
         System.out.println(json);
         System.out.println("\n----------------\n");
+        
+        System.out.println(testCsv);
+        System.out.println("\n----------------\n");
+        
         String csv = Converter.jsonToCsv(testJson);
         System.out.println(csv);
     }
